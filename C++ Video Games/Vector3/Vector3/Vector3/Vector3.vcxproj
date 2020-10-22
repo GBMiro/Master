@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Vector3Template.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
