@@ -6,41 +6,25 @@ String::String() {
 }
 
 String::String(const char* string) {
-	int i = 0;
-	const char* aux = string;
+	size_t i = 0;
 
-	while (*string != ('\0')) {
-		++i;
-		++string;
-	}
-
-	size = i + 1;
-	str = new char[size];
-	i = 0;
-
-	while (*aux != ('\0')) {
-		str[i] = *aux;
-		++aux;
+	while (string[i] != ('\0')) {
 		++i;
 	}
 
-	str[size - 1] = '\0';
+	size = i;
+	
+	if (string != nullptr) {
+		str = new char[size + 1];
+		copy(string, str, size);
+	}
 }
 
 String::String(const String& string) {
 	size = string.size;
-	str = new char[size];
-
-	char* aux = string.str;
+	str = new char[size + 1];
 	
-	int i = 0;
-	while (*aux != ('\0')) {
-		str[i] = *aux;
-		++aux;
-		++i;
-	}
-
-	str[size - 1] = '\0';
+	copy(string.str, str, size);
 }
 
 String::String(String&& string)  {
@@ -50,64 +34,71 @@ String::String(String&& string)  {
 }
 
 String::~String() {
-	delete str;
+	delete[] str;
 }
 
-int String::length() const {
-	return size - 1 >= 0 ? size - 1 : 0 ;
+size_t String::length() const {
+	return size;
 }
 
 void String::clear() {
-	delete str;
+	delete[] str;
 	str = nullptr;
 	size = 0;
 }
 
+String& String::operator=(String&& string)
+{
+	delete[] str;
+	str = string.str;
+	size = string.size;
+	string.str = nullptr;
+
+	return *this;
+}
+
+String& String::operator=(const String& string)
+{
+	clear();
+	if (string.str != nullptr) {
+		size = string.size;
+		str = new char[size + 1];
+		copy(string.str, str, size);
+	}
+
+	return *this;
+}
+
 bool String::operator==(const String& string) const {
 	bool equals = true;
-	char* str1 = string.str;
-	char* str2 = this->str;
+	size_t len = this->length();
+	if (len != string.length()) equals = false;
 
-	if (this->length() != string.length()) equals = false;
-
-	while (equals and *str1 != '\0') {
-		if (*str1 != *str2) equals = false;
-		++str1;
-		++str2;
+	for (int i = 0; i < len and equals; ++i) {
+		if (this->str[i] != string.str[i]) equals = false;
 	}
+
 	return equals;
 }
 
 String String::operator+(const String& string) const {
 
 	String res = String();
-	delete res.str;
-	int newSize = length() + string.length() + 1;
-	res.str = new char[newSize];
+	size_t len1 = length();
+	size_t len2 = string.length();
+	size_t newSize = len1 + len2;
+	res.str = new char[newSize + 1];
 	res.size = newSize;
 
-	int i = 0;
-	char* str1 = str;
-	char* str2 = string.str;
-
-	while (*str1 != '\0') {
-		res.str[i] = *str1;
-		++str1;
-		++i;
-	}
-	
-	while (*str2 != '\0') {
-		res.str[i] = *str2;
-		++str2;
-		++i;
-	}
-
-	res.str[newSize - 1] = '\0';
+	copy(this->str, res.str, len1);
+	copy(string.str, res.str + len1, len2);
 
 	return res;
 }
 
-inline String getMeAString()
-{
-	return String("Another string");
+void copy(const char* src, char* dst, size_t length) {
+	for (int i = 0; i < length; ++i) {
+		dst[i] = src[i];
+	}
+	dst[length] = '\0';
 }
