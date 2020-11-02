@@ -8,16 +8,21 @@ String::String() {
 String::String(const char* string) {
 	size_t i = 0;
 
-	while (string[i] != ('\0')) {
-		++i;
-	}
-
-	size = i;
-	
 	if (string != nullptr) {
+
+		while (string[i] != ('\0')) {
+			++i;
+		}
+
+		size = i;
 		str = new char[size + 1];
 		copy(string, str, size);
 	}
+	else {
+		size = 0;
+	}
+
+
 }
 
 String::String(const String& string) {
